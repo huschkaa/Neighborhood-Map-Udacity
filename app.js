@@ -4,12 +4,19 @@ var markers = [];
 function initMap () {
   map = new google.maps.Map(document.getElementById('map'), {
       center: {lat: 29.804968, lng: -95.418756},
+      styles: styles,
+      mapTypeControl: false,
       zoom: 16,
   });
 
   //Set variable for the info window to be created
   var largeInfowindow = new google.maps.InfoWindow();
   var bounds = new google.maps.LatLngBounds();
+
+  // Style the markers a bit. This will be our listing marker icon.
+  var defaultIcon = makeMarkerIcon('3ad88e');
+  // Create a "highlighted location" marker color for when the user mouses over
+  var highlightedIcon = makeMarkerIcon('f2f287');
 
   // Create the markers for the entire map
   for (var i = 0; i < locations.length; i++) {
@@ -20,6 +27,7 @@ function initMap () {
     var marker = new google.maps.Marker({
       position: position,
       title: title,
+      icon: defaultIcon,
       animation: google.maps.Animation.DROP,
       id: i
     });
@@ -27,9 +35,18 @@ function initMap () {
   //push the markers to the array
   markers.push(marker);
 
-//onclick event that opens the info window when clicked
+  //onclick event that opens the info window when clicked
   marker.addListener('click', function() {
     populateInfoWindow(this, largeInfowindow);
+  });
+
+  // Event listeners that toggle color of marker icons when mouseover and mouseout
+  marker.addListener('mouseover', function() {
+    this.setIcon(highlightedIcon);
+  });
+
+  marker.addListener('mouseout', function() {
+    this.setIcon(defaultIcon);
   });
 }
   document.getElementById('show-listings').addEventListener('click', showListings);
@@ -48,6 +65,7 @@ function populateInfoWindow(marker, infowindow) {
          });
        }
      }
+
      // This function will loop through the markers array and display them all.
      function showListings() {
        var bounds = new google.maps.LatLngBounds();
@@ -64,3 +82,16 @@ function populateInfoWindow(marker, infowindow) {
          markers[i].setMap(null);
        }
      }
+
+
+    // This function takes in a COLOR, and then creates a new marker icon of that color. The icon will be 21 px wide by 34 high, have an origin of 0, 0 and be anchored at 10, 34).
+    function makeMarkerIcon(markerColor) {
+      var markerImage = new google.maps.MarkerImage(
+        'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
+        '|40|_|%E2%80%A2',
+        new google.maps.Size(21, 34),
+        new google.maps.Point(0, 0),
+        new google.maps.Point(10, 34),
+        new google.maps.Size(21,34));
+      return markerImage;
+    }
