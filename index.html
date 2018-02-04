@@ -16,9 +16,19 @@
         <input id="show-listings" type="button" value="Show Listings">
         <input id="hide-listings" type="button" value="Hide Listings">
       </div>
+      <hr>
+      <div>
+        <span class="text">Search for nearby places</span>
+        <input type="text" data-bind="textInput: searchOption, valueUpdate: 'afterkeydown'" placeholder="search for a location">
+      </div>
+      <div>
+        <ul class="navigation" data-bind="foreach: locationsearch">
+          <li class="nav-item" data-bind="text: title"></li>
+        </ul>
+      </div>
     </div>
-    <div id="map"></div>
-  </div>
+      <div id="map"></div>
+    </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
@@ -26,7 +36,7 @@
     <script src="app.js"></script>
     <script src="locations.js"></script>
     <script src="styles.js"></script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4MRV9PEQhxznQPHEmjGCZTVHHxiXkYbg&v=3&callback=initMap" onerror="errorHandlingMap()">
+    <script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyD4MRV9PEQhxznQPHEmjGCZTVHHxiXkYbg&v=3&callback=initMap">
 </script>
 </body>
 </html>

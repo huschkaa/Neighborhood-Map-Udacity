@@ -39,3 +39,16 @@ h1 {
      text-align: left;
      width: 340px;
    }
+
+#SearchField {
+     width: 70%;
+   }
+
+#SearchButton {
+     width: 24%;
+   }
+
+.nav-item {
+  color: black;
+  font-size: 20px;
+}
