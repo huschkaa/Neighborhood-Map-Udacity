@@ -2,11 +2,35 @@
 var markers = [];
 var map;
 
+
 function populateInfoWindow(marker, infowindow) {
    // Check to make sure the infowindow is not already opened on this marker.
    if (infowindow.marker != marker) {
+     infowindow.setContent('');
      infowindow.marker = marker;
-     infowindow.setContent('<div>' + marker.title + '</div>');
+     // Foursquare API Client ID and Secret credentials
+     clientID = "NRK0KBINCBSNXBJBYPP2GATZRHQ1PAQL2UWNUGBS2UXI5WPR";
+     clientSecret = "SLVGMRUD1B3ITNUTMG4TAX4JKQRZPYTW3H2JVU3R4DAPQXQ3";
+     // URL used to make request from foursquare
+     var apiurl = 'https://api.foursquare.com/v2/venues/search?ll=' + 29.804320 + ',' + -95.427390 + '&client_id=' + clientID + '&client_secret=' + clientSecret + '&query=' + marker.title +'&v=20171230' + '&m=foursquare';
+     // Foursquare API call and data to return
+     $.getJSON(apiurl).done(function(marker) {
+         var response = marker.response.venues[0];
+         self.street = response.location.address;
+         self.city = response.location.formattedAddress[1];
+         self.category = response.categories[0].shortName;
+         self.URL = response.url;
+
+         self.htmlContentFoursquare = '<h5>(' + self.category +')</h5>' + '<div>' +
+             '<h6> Address: </h6>' + '<p>' + self.street + '</p>' + '<p>' + self.city + '</p>' + + '<div>' + self.URL + '</div>' + '</div>' + '</div>';
+
+         infowindow.setContent(self.htmlContent + self.htmlContentFoursquare);
+         }).fail(function() {
+             alert("There was an issue loading the Foursquare API. Please refresh your page to try again.");
+         });
+
+         this.htmlContent = '<div>' + '<h4>' + marker.title +'</h4>';
+
      infowindow.open(map, marker);
 
      // Make sure the marker property is cleared if the infowindow is closed.
@@ -14,7 +38,7 @@ function populateInfoWindow(marker, infowindow) {
        infowindow.setMarker = null;
      });
    }
- }
+ };
 
 // This function will loop through the markers array and display them all.
  function showListings() {
