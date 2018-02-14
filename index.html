@@ -19,11 +19,13 @@
       <hr>
       <div>
         <span class="text">Search for nearby places</span>
-        <input type="text" data-bind="textInput: searchOption, valueUpdate: 'afterkeydown'" placeholder="search for a location">
+        <input type="text" id="search" data-bind="textInput: searchOption" placeholder="search for a location">
       </div>
       <div>
-        <ul class="navigation" data-bind="foreach: locationsearch">
-          <li class="nav-item" data-bind="text: title"></li>
+        <ul class="navigation" data-bind="foreach: filterLocations">
+          <li>
+            <a href="#" class="nav-item" data-bind="text: title, click: setMarkeronClick"></a>
+          </li>
         </ul>
       </div>
     </div>

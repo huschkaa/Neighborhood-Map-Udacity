@@ -130,26 +130,54 @@ function makeMarkerIcon(markerColor) {
 
 function ViewModel() {
   var self = this;
-  this.markers = [];
+  var searchResult;
+  var marker;
 
     //Make text typed in search box observable
-    this.searchOption = ko.observable("");
+    self.searchOption = ko.observable('');
+    self.locationList = ko.observableArray();
+    self.showFilteredMarkers = ko.observable(); // location to store the filter
 
-    // Data bind for locations to filter through list of locations
-    this.locationsearch = ko.computed(function() {
-        var result = [];
-        for (var i = 0; i < this.markers.length; i++) {
-            var markerLocation = this.markers[i];
-            if (markerLocation.title.toLowerCase().includes(this.searchOption()
-                    .toLowerCase())) {
-                result.push(markerLocation);
-                this.markers[i].setVisible(true);
-            } else {
-                this.markers[i].setVisible(false);
-            }
+    this.setMarkeronClick = function(Item) {
+        google.maps.event.trigger(Item.marker, 'click');
+    };
+
+    //iterates through locations in Model and adds info to markers
+   locations.forEach(function (markerItem) {
+        self.locationList.push( new Location(markerItem));
+    });
+
+    // Filter based on user text
+    self.filterLocations = ko.computed(function () {
+        if (!self.searchOption()) {
+            searchResult = self.locationList();
+        } else {
+            searchResult = ko.utils.arrayFilter(self.locationList(), function (location) {
+                return (
+                    (self.searchOption().length == 0 || location.name().toLowerCase().indexOf(self.searchOption().toLowerCase()) > -1)
+                );
+            });
         }
-        return result;
-    }, this);
+
+        // Call showFilteredMarkers to visible only those markers, matched from user input
+        self.showFilteredMarkers(searchResult, self.locationList());
+        return searchResult;
+    });
+
+    // To make visible user serach result only
+    self.showFilteredMarkers = function(filteredSearchArray, locationArray) {
+          var i;
+        for ( i = 0; i < locationArray.length; i++) {
+            locationArray[i].marker.setVisible(false);
+        }
+
+        for ( i = 0; i < filteredSearchArray.length; i++) {
+
+            locationArray[i].marker.setVisible(true);
+        }
+
+    };
+
 }
 
 function initMap() {
