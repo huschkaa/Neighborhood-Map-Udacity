@@ -1,185 +1,188 @@
 // global Variables
-var markers = [];
 var map;
-
-
-function populateInfoWindow(marker, infowindow) {
-   // Check to make sure the infowindow is not already opened on this marker.
-   if (infowindow.marker != marker) {
-     infowindow.setContent('');
-     infowindow.marker = marker;
-     // Foursquare API Client ID and Secret credentials
-     clientID = "NRK0KBINCBSNXBJBYPP2GATZRHQ1PAQL2UWNUGBS2UXI5WPR";
-     clientSecret = "SLVGMRUD1B3ITNUTMG4TAX4JKQRZPYTW3H2JVU3R4DAPQXQ3";
-     // URL used to make request from foursquare
-     var apiurl = 'https://api.foursquare.com/v2/venues/search?ll=' + 29.804320 + ',' + -95.427390 + '&client_id=' + clientID + '&client_secret=' + clientSecret + '&query=' + marker.title +'&v=20171230' + '&m=foursquare';
-     // Foursquare API call and data to return
-     $.getJSON(apiurl).done(function(marker) {
-         var response = marker.response.venues[0];
-         self.street = response.location.address;
-         self.city = response.location.formattedAddress[1];
-         self.category = response.categories[0].shortName;
-         self.URL = response.url;
-
-         self.htmlContentFoursquare = '<h5>(' + self.category +')</h5>' + '<div>' +
-             '<h6> Address: </h6>' + '<p>' + self.street + '</p>' + '<p>' + self.city + '</p>' + + '<div>' + self.URL + '</div>' + '</div>' + '</div>';
-
-         infowindow.setContent(self.htmlContent + self.htmlContentFoursquare);
-         }).fail(function() {
-             alert("There was an issue loading the Foursquare API. Please refresh your page to try again.");
-         });
-
-         this.htmlContent = '<div>' + '<h4>' + marker.title +'</h4>';
-
-     infowindow.open(map, marker);
-
-     // Make sure the marker property is cleared if the infowindow is closed.
-     infowindow.addListener('closeclick',function(){
-       infowindow.setMarker = null;
-     });
-   }
- };
-
-// This function will loop through the markers array and display them all.
- function showListings() {
-   var bounds = new google.maps.LatLngBounds();
-   // Extend the boundaries of the map for each marker and display the marker
-   for (var i = 0; i < markers.length; i++) {
-     markers[i].setMap(map);
-     bounds.extend(markers[i].position);
-   }
-   map.fitBounds(bounds);
- }
-
-// This function will loop through the listings and hide them all.
-function hideListings() {
-   for (var i = 0; i < markers.length; i++) {
-     markers[i].setMap(null);
-   }
-}
-
-//create the google map with styles.js
-this.initMap = function() {
-        map = new google.maps.Map(document.getElementById('map'), {
-            center: {lat: 29.804968, lng: -95.418756},
-            styles: styles,
-            mapTypeControl: false,
-            zoom: 16,
-        });
-
-        //Set variable for the info window to be created
-        var largeInfowindow = new google.maps.InfoWindow();
-        var bounds = new google.maps.LatLngBounds();
-
-        // Style the markers a bit. This will be our listing marker icon.
-        var defaultIcon = makeMarkerIcon('3ad88e');
-
-        // Create a "highlighted location" marker color for when the user mouses over
-        var highlightedIcon = makeMarkerIcon('f2f287');
-
-        // Create the markers for the entire map
-        for (var i = 0; i < locations.length; i++) {
-
-          // Get the position from the location array.
-          this.position = locations[i].location;
-          this.title = locations[i].title;
-
-          // Create a marker per location, and put into markers array.
-          var marker = new google.maps.Marker({
-            position: this.position,
-            title: this.title,
-            icon: defaultIcon,
-            animation: google.maps.Animation.DROP,
-            id: i
-          });
-
-        //push the markers to the array
-        markers.push(marker);
-
-        //onclick event that opens the info window when clicked
-        marker.addListener('click', function() {
-          populateInfoWindow(this, largeInfowindow);
-        });
-
-        // Event listeners that toggle color of marker icons when mouseover and mouseout
-        marker.addListener('mouseover', function() {
-          this.setIcon(highlightedIcon);
-        });
-
-        marker.addListener('mouseout', function() {
-          this.setIcon(defaultIcon);
-          });
-        }
-
-        //event listener to show/hide listening on click
-        document.getElementById('show-listings').addEventListener('click', showListings);
-        document.getElementById('hide-listings').addEventListener('click', hideListings);
-};
-
-// This function takes in a COLOR, and then creates a new marker icon of that color. The icon will be 21 px wide by 34 high, have an origin of 0, 0 and be anchored at 10, 34).
-function makeMarkerIcon(markerColor) {
-  var markerImage = new google.maps.MarkerImage(
-    'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
-    '|40|_|%E2%80%A2',
-    new google.maps.Size(21, 34),
-    new google.maps.Point(0, 0),
-    new google.maps.Point(10, 34),
-    new google.maps.Size(21,34));
-  return markerImage;
-}
-
-function ViewModel() {
-  var self = this;
-  var searchResult;
-  var marker;
-
-    //Make text typed in search box observable
-    self.searchOption = ko.observable('');
-    self.locationList = ko.observableArray();
-    self.showFilteredMarkers = ko.observable(); // location to store the filter
-
-    this.setMarkeronClick = function(Item) {
-        google.maps.event.trigger(Item.marker, 'click');
-    };
-
-    //iterates through locations in Model and adds info to markers
-   locations.forEach(function (markerItem) {
-        self.locationList.push( new Location(markerItem));
-    });
-
-    // Filter based on user text
-    self.filterLocations = ko.computed(function () {
-        if (!self.searchOption()) {
-            searchResult = self.locationList();
-        } else {
-            searchResult = ko.utils.arrayFilter(self.locationList(), function (location) {
-                return (
-                    (self.searchOption().length == 0 || location.name().toLowerCase().indexOf(self.searchOption().toLowerCase()) > -1)
-                );
-            });
-        }
-
-        // Call showFilteredMarkers to visible only those markers, matched from user input
-        self.showFilteredMarkers(searchResult, self.locationList());
-        return searchResult;
-    });
-
-    // To make visible user serach result only
-    self.showFilteredMarkers = function(filteredSearchArray, locationArray) {
-          var i;
-        for ( i = 0; i < locationArray.length; i++) {
-            locationArray[i].marker.setVisible(false);
-        }
-
-        for ( i = 0; i < filteredSearchArray.length; i++) {
-
-            locationArray[i].marker.setVisible(true);
-        }
-
-    };
-
-}
+var infoWindow;
+var bounds;
 
 function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: {lat: 29.804968, lng: -95.418756},
+      styles: styles,
+      mapTypeControl: false,
+      zoom: 15,
+    });
+    infoWindow = new google.maps.InfoWindow();
+
+    bounds = new google.maps.LatLngBounds();
+
     ko.applyBindings(new ViewModel());
+}
+
+//Will handle map error and notify the user
+function MapError() {
+    alert('An error occurred with Google Maps!');
+}
+
+var LocationMarker = function(data) {
+    var self = this;
+
+    this.title = data.title;
+    this.position = data.location;
+    this.street = '';
+    this.city = '';
+    this.category = '';
+    this.url = '';
+    this.phone = '';
+
+    this.visible = ko.observable(true);
+
+    // Style the markers a bit. This will be our listing marker icon.
+    var defaultIcon = makeMarkerIcon('3ad88e');
+
+    // Create a "highlighted location" marker color for when the user mouses over
+    var highlightedIcon = makeMarkerIcon('f2f287');
+
+    // Foursquare API Client ID and Secret credentials
+    var clientID = 'NRK0KBINCBSNXBJBYPP2GATZRHQ1PAQL2UWNUGBS2UXI5WPR';
+    var clientSecret = 'SLVGMRUD1B3ITNUTMG4TAX4JKQRZPYTW3H2JVU3R4DAPQXQ3';
+
+    // get JSON request of foursquare data
+    var apiurl = 'https://api.foursquare.com/v2/venues/search?ll=' + this.position.lat + ',' + this.position.lng + '&client_id=' + clientID + '&client_secret=' + clientSecret + '&v=20160118' + '&query=' + this.title;
+
+    $.getJSON(apiurl).done(function(data) {
+		var results = data.response.venues[0];
+        self.category = results.categories[0].shortName ? results.categories[0].shortName: 'N/A';
+        self.street = results.location.address ? results.location.address: 'N/A';
+        self.city = results.location.formattedAddress[1] ? results.location.formattedAddress[1]: 'N/A';
+        self.phone = results.contact.formattedPhone ? results.contact.formattedPhone : 'N/A';
+        self.url = results.url ? results.url: 'N/A';
+    }).fail(function() {
+        alert('We were unable to connect with FourSquare. Please attempt to refresh the page.');
+    });
+
+    // Create a marker per location, and put into markers array
+    this.marker = new google.maps.Marker({
+        position: this.position,
+        title: this.title,
+        animation: google.maps.Animation.DROP,
+        icon: defaultIcon
+    });
+
+    self.filterMarkers = ko.computed(function () {
+        // set marker and extend bounds (showListings)
+        if(self.visible() === true) {
+            self.marker.setMap(map);
+            bounds.extend(self.marker.position);
+            map.fitBounds(bounds);
+        } else {
+            self.marker.setMap(null);
+        }
+    });
+
+    // Create an onclick even to open an indowindow at each marker
+    this.marker.addListener('click', function() {
+        populateInfoWindow(this, self.category, self.street, self.city, self.phone, self.url, infoWindow);
+        toggleBounce(this);
+        map.panTo(this.getPosition());
+    });
+
+    // Two event listeners - one for mouseover, one for mouseout,
+    // to change the colors back and forth.
+    this.marker.addListener('mouseover', function() {
+        this.setIcon(highlightedIcon);
+    });
+    this.marker.addListener('mouseout', function() {
+        this.setIcon(defaultIcon);
+    });
+
+    // show item info when selected from list
+    this.show = function(location) {
+        google.maps.event.trigger(self.marker, 'click');
+    };
+
+    // creates bounce effect when item selected
+    this.bounce = function(place) {
+		google.maps.event.trigger(self.marker, 'click');
+	};
+
+};
+
+
+var ViewModel = function(){
+  var self = this;
+
+  this.searchItem = ko.observable('');
+
+  this.mapList = ko.observableArray([]);
+
+  // add location markers for each location
+  locations.forEach(function(location) {
+      self.mapList.push( new LocationMarker(location) );
+  });
+
+  // locations viewed on map
+  this.locationList = ko.computed(function() {
+      var searchFilter = self.searchItem().toLowerCase();
+      if (searchFilter) {
+          return ko.utils.arrayFilter(self.mapList(), function(location) {
+              var str = location.title.toLowerCase();
+              var result = str.includes(searchFilter);
+              location.visible(result);
+      return result;
+    });
+      }
+      self.mapList().forEach(function(location) {
+          location.visible(true);
+      });
+      return self.mapList();
+  }, self);
+};
+
+// This function populates the infowindow when the marker is clicked. We'll only allow
+// one infowindow which will open at the marker that is clicked, and populate based
+// on that markers position.
+function populateInfoWindow(marker, category, street, city, phone, url, infowindow) {
+  // Check to make sure the infowindow is not already opened on this marker.
+  if (infowindow.marker != marker) {
+      infowindow.setContent('');
+      infowindow.marker = marker;
+
+      // Make sure the marker property is cleared if the infowindow is closed.
+      infowindow.addListener('closeclick', function() {
+          infowindow.marker = null;
+      });
+
+      var windowContent =
+        '<h4>' + marker.title + '</h4>' + '<h5>' + category + '</h5>' +
+        street + '<br>' + city + '<br>' + phone + '<br>' + '<a href="'+url+'" target="blank" > Website </a>'+'</p>';
+
+      infowindow.setContent(windowContent);
+
+      // Open the infowindow on the correct marker.
+      infowindow.open(map, marker);
+  }
+}
+
+function toggleBounce(marker) {
+if (marker.getAnimation() !== null) {
+  marker.setAnimation(null);
+} else {
+  marker.setAnimation(google.maps.Animation.BOUNCE);
+  setTimeout(function() {
+      marker.setAnimation(null);
+  }, 1400);
+}
+}
+
+// This function takes in a COLOR, and then creates a new marker
+// icon of that color. The icon will be 21 px wide by 34 high, have an origin
+// of 0, 0 and be anchored at 10, 34).
+function makeMarkerIcon(markerColor) {
+  var markerImage = new google.maps.MarkerImage(
+      'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor +
+      '|40|_|%E2%80%A2',
+      new google.maps.Size(21, 34),
+      new google.maps.Point(0, 0),
+      new google.maps.Point(10, 34),
+      new google.maps.Size(21, 34));
+  return markerImage;
 }

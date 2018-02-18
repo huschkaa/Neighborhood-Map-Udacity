@@ -13,19 +13,14 @@
     <div class="options-box">
       <h1>Houston Heights Neighborhood</h1>
       <div>
-        <input id="show-listings" type="button" value="Show Listings">
-        <input id="hide-listings" type="button" value="Hide Listings">
-      </div>
-      <hr>
-      <div>
         <span class="text">Search for nearby places</span>
-        <input type="text" id="search" data-bind="textInput: searchOption" placeholder="search for a location">
+        <input type="text" id="search" data-bind="textInput: searchItem, valueUpdate: 'afterkeydown'" placeholder="search for a location">
       </div>
       <div>
-        <ul class="navigation" data-bind="foreach: filterLocations">
-          <li>
-            <a href="#" class="nav-item" data-bind="text: title, click: setMarkeronClick"></a>
-          </li>
+        <ul class="navigation" data-bind="foreach: locationList">
+          <ul>
+            <a href="#" class="nav-item" data-bind="text: title, click: show"></a>
+          </ul>
         </ul>
       </div>
     </div>
@@ -38,7 +33,7 @@
     <script src="app.js"></script>
     <script src="locations.js"></script>
     <script src="styles.js"></script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyD4MRV9PEQhxznQPHEmjGCZTVHHxiXkYbg&v=3&callback=initMap">
+    <script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyD4MRV9PEQhxznQPHEmjGCZTVHHxiXkYbg&v=3&callback=initMap" onerror="MapError()">
 </script>
 </body>
 </html>

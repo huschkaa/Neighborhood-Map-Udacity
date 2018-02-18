@@ -28,4 +28,4 @@ var locations = [
         title: 'King\'s BierHaus',
         location: {lat: 29.804320, lng: -95.427390}
     }
-];
+  ];
