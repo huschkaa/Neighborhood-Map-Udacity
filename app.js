@@ -46,7 +46,7 @@ var LocationMarker = function(data) {
     var clientSecret = 'SLVGMRUD1B3ITNUTMG4TAX4JKQRZPYTW3H2JVU3R4DAPQXQ3';
 
     // get JSON request of foursquare data
-    var apiurl = 'https://api.foursquare.com/v2/venues/search?ll=' + this.position.lat + ',' + this.position.lng + '&client_id=' + clientID + '&client_secret=' + clientSecret + '&v=20160118' + '&query=' + this.title;
+    var apiurl = 'https://api.foursquare.com/v2/venues/search?ll=' + this.position.lat + ',' + this.position.lng + '&client_id=' + clientID + '&client_secret=' + clientSecret + '&v=20171230' + '&query=' + this.title;
 
     $.getJSON(apiurl).done(function(data) {
 		var results = data.response.venues[0];
@@ -103,43 +103,9 @@ var LocationMarker = function(data) {
     this.bounce = function(place) {
 		google.maps.event.trigger(self.marker, 'click');
 	};
-
 };
 
-
-var ViewModel = function(){
-  var self = this;
-
-  this.searchItem = ko.observable('');
-
-  this.mapList = ko.observableArray([]);
-
-  // add location markers for each location
-  locations.forEach(function(location) {
-      self.mapList.push( new LocationMarker(location) );
-  });
-
-  // locations viewed on map
-  this.locationList = ko.computed(function() {
-      var searchFilter = self.searchItem().toLowerCase();
-      if (searchFilter) {
-          return ko.utils.arrayFilter(self.mapList(), function(location) {
-              var str = location.title.toLowerCase();
-              var result = str.includes(searchFilter);
-              location.visible(result);
-      return result;
-    });
-      }
-      self.mapList().forEach(function(location) {
-          location.visible(true);
-      });
-      return self.mapList();
-  }, self);
-};
-
-// This function populates the infowindow when the marker is clicked. We'll only allow
-// one infowindow which will open at the marker that is clicked, and populate based
-// on that markers position.
+// This function populates the infowindow when the marker is clicked. We'll only allow one infowindow which will open at the marker that is clicked, and populate based on that markers position.
 function populateInfoWindow(marker, category, street, city, phone, url, infowindow) {
   // Check to make sure the infowindow is not already opened on this marker.
   if (infowindow.marker != marker) {
@@ -163,19 +129,17 @@ function populateInfoWindow(marker, category, street, city, phone, url, infowind
 }
 
 function toggleBounce(marker) {
-if (marker.getAnimation() !== null) {
-  marker.setAnimation(null);
-} else {
-  marker.setAnimation(google.maps.Animation.BOUNCE);
-  setTimeout(function() {
-      marker.setAnimation(null);
-  }, 1400);
-}
+  if (marker.getAnimation() !== null) {
+    marker.setAnimation(null);
+  } else {
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+    setTimeout(function() {
+        marker.setAnimation(null);
+    }, 1400);
+  }
 }
 
-// This function takes in a COLOR, and then creates a new marker
-// icon of that color. The icon will be 21 px wide by 34 high, have an origin
-// of 0, 0 and be anchored at 10, 34).
+// This function takes in a COLOR, and then creates a new marker icon of that color. The icon will be 21 px wide by 34 high, have an origin of 0, 0 and be anchored at 10, 34).
 function makeMarkerIcon(markerColor) {
   var markerImage = new google.maps.MarkerImage(
       'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor +
@@ -186,3 +150,32 @@ function makeMarkerIcon(markerColor) {
       new google.maps.Size(21, 34));
   return markerImage;
 }
+
+var ViewModel = function(){
+  var self = this;
+
+  this.searchLocation = ko.observable('');
+  this.locationArray = ko.observableArray([]);
+
+  // add location markers for each location
+  locations.forEach(function(location) {
+      self.locationArray.push( new LocationMarker(location) );
+  });
+
+  // locations viewed on map
+  this.locationList = ko.computed(function() {
+      var searchFilter = self.searchLocation().toLowerCase();
+      if (searchFilter) {
+          return ko.utils.arrayFilter(self.locationArray(), function(location) {
+              var str = location.title.toLowerCase();
+              var result = str.includes(searchFilter);
+              location.visible(result);
+      return result;
+    });
+      }
+      self.locationArray().forEach(function(location) {
+          location.visible(true);
+      });
+      return self.locationArray();
+  }, self);
+};

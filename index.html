@@ -5,31 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Heights Neighborhood Map</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="navigation.css">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 </head>
 <body>
 
-  <div class="mapcontainer">
-    <div class="options-box">
-      <h1>Houston Heights Neighborhood</h1>
-      <div>
-        <span class="text">Search for nearby places</span>
-        <input type="text" id="search" data-bind="textInput: searchItem, valueUpdate: 'afterkeydown'" placeholder="search for a location">
+      <div id="wrapper">
+          <div class="overlay"></div>
+          <!-- Sidebar -->
+          <nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation">
+              <ul class="nav sidebar-nav">
+                  <li class="sidebar-brand">
+                    <a href="#">Houston Heights</a>
+                  </li>
+                  <div>
+                      <input type="text" id="search" data-bind="textInput: searchLocation, valueUpdate: 'afterkeydown'" placeholder="Search for a location">
+                  </div>
+                    <div>
+                      <ul class="navigation" data-bind="foreach: locationList">
+                        <ul>
+                          <a href="#" class="nav-item" data-bind="text: title, click: show"></a>
+                        </ul>
+                      </ul>
+                    </div>
+                  </div>
+                </ul>
+          </nav>
+          <!-- /#sidebar-wrapper -->
+
+          <!-- Page Content -->
+          <div id="page-content-wrapper">
+              <button type="button" class="hamburger is-closed" data-toggle="offcanvas">
+                  <span class="hamb-top"></span>
+      			<span class="hamb-middle"></span>
+  				<span class="hamb-bottom"></span>
+              </button>
+              <div class="container">
+                  <div class="row">
+                      <div class="col-lg-8 col-lg-offset-2" id="map"></div>
+              </div>
+          </div>
+          <!-- /#page-content-wrapper -->
       </div>
-      <div>
-        <ul class="navigation" data-bind="foreach: locationList">
-          <ul>
-            <a href="#" class="nav-item" data-bind="text: title, click: show"></a>
-          </ul>
-        </ul>
-      </div>
-    </div>
-      <div id="map"></div>
-    </div>
+      <!-- /#wrapper -->
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <script src="navigation.js"></script>
     <script src="app.js"></script>
     <script src="locations.js"></script>
     <script src="styles.js"></script>
