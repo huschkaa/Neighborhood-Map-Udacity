@@ -31,11 +31,13 @@ input {
   color: #FFFFFF;
 }
 
-.overlay {
-  display: none;
-}
 
 ul {
   padding-left: 10px;
   padding-top: 3px;
+}
+
+#nav-item {
+  text-align: left;
+  color: #FFFFFF;
 }
