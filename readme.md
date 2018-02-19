@@ -15,7 +15,7 @@ Ensure you have moved to a location in your directory where you want to copy the
 $ Git Clone https://github.com/huschkaa/Neighborhood-Map-Udacity.git
 ```
 Live Version:
-[https://huschkaa.github.io/Neighborhood-Map-Udacity/](https://huschkaa.github.io/fend-project-memory-game-master/)
+[https://huschkaa.github.io/Neighborhood-Map-Udacity/](https://huschkaa.github.io/Neighborhood-Map-Udacity/)
 
 ## About
 
