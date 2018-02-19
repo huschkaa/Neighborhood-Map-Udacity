@@ -48,13 +48,14 @@ var LocationMarker = function(data) {
     // get JSON request of foursquare data
     var apiurl = 'https://api.foursquare.com/v2/venues/search?ll=' + this.position.lat + ',' + this.position.lng + '&client_id=' + clientID + '&client_secret=' + clientSecret + '&v=20171230' + '&query=' + this.title;
 
+    //call foursquare for an API request for data that will be utilized
     $.getJSON(apiurl).done(function(data) {
 		var results = data.response.venues[0];
         self.category = results.categories[0].shortName ? results.categories[0].shortName: 'N/A';
-        self.street = results.location.address ? results.location.address: 'N/A';
-        self.city = results.location.formattedAddress[1] ? results.location.formattedAddress[1]: 'N/A';
-        self.phone = results.contact.formattedPhone ? results.contact.formattedPhone : 'N/A';
-        self.url = results.url ? results.url: 'N/A';
+        self.street = results.location.address ? results.location.address: 'No Address Available';
+        self.city = results.location.formattedAddress[1] ? results.location.formattedAddress[1]: 'No Address Available';
+        self.phone = results.contact.formattedPhone ? results.contact.formattedPhone : 'No Phone Number Available';
+        self.url = results.url ? results.url: 'No Website Available';
     }).fail(function() {
         alert('We were unable to connect with FourSquare. Please attempt to refresh the page.');
     });
@@ -85,11 +86,11 @@ var LocationMarker = function(data) {
         map.panTo(this.getPosition());
     });
 
-    // Two event listeners - one for mouseover, one for mouseout,
-    // to change the colors back and forth.
+    // Event listenets that will change on mouse over and mouse out of the marker icons to change colors
     this.marker.addListener('mouseover', function() {
         this.setIcon(highlightedIcon);
     });
+
     this.marker.addListener('mouseout', function() {
         this.setIcon(defaultIcon);
     });
@@ -117,17 +118,18 @@ function populateInfoWindow(marker, category, street, city, phone, url, infowind
           infowindow.marker = null;
       });
 
+      //info that will be populated and shown in the infowindow
       var windowContent =
         '<h4>' + marker.title + '</h4>' + '<h5>' + category + '</h5>' +
         street + '<br>' + city + '<br>' + phone + '<br>' + '<a href="'+url+'" target="blank" > Website </a>'+'</p>';
 
+      // Set the content and open the infowindow on the correct marker.
       infowindow.setContent(windowContent);
-
-      // Open the infowindow on the correct marker.
       infowindow.open(map, marker);
   }
 }
 
+//Function for bouncing the maker when it is clicked
 function toggleBounce(marker) {
   if (marker.getAnimation() !== null) {
     marker.setAnimation(null);
@@ -154,6 +156,7 @@ function makeMarkerIcon(markerColor) {
 var ViewModel = function(){
   var self = this;
 
+  //setup observables in the viewmodel
   this.searchLocation = ko.observable('');
   this.locationArray = ko.observableArray([]);
 
@@ -162,7 +165,7 @@ var ViewModel = function(){
       self.locationArray.push( new LocationMarker(location) );
   });
 
-  // locations viewed on map
+  // This computed function will filter through as the user types and only show the locations in the location array that match
   this.locationList = ko.computed(function() {
       var searchFilter = self.searchLocation().toLowerCase();
       if (searchFilter) {
