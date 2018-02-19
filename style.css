@@ -8,10 +8,10 @@ html, body {
 input {
      font-size: 12px;
    }
-h1 {
-     color: #525454;
+.title {
+     color: #FFFFFF;
      font-size: 22px;
-     margin: 0 0 10px 0;
+     padding: 10px;
      text-align: center;
    }
 
@@ -21,3 +21,17 @@ h1 {
     width: 100%;
      position: absolute;
    }
+
+#locationlist {
+  padding: 0px;
+}
+
+.nav-item {
+  padding: 0px;
+  color: #FFFFFF;
+}
+
+ul {
+  padding-left: 10px;
+  padding-top: 3px;
+}
